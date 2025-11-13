@@ -365,21 +365,119 @@ document.addEventListener('DOMContentLoaded', () => {
     slides.forEach(slide => slideObserver.observe(slide));
 });
 
-// Mobile Navigation Toggle
-const mobileMenuButton = document.getElementById('mobile-menu-button');
-const mobileMenu = document.getElementById('mobile-menu');
+// Simple Mobile Menu
+document.addEventListener('DOMContentLoaded', () => {
+    const hamburgerBtn = document.getElementById('hamburger-btn');
+    const closeMenuBtn = document.getElementById('close-menu-btn');
+    const menuOverlay = document.getElementById('menu-overlay');
+    const menuPanel = document.getElementById('menu-panel');
+    const menuItems = document.querySelectorAll('.menu-item');
 
-if (mobileMenuButton && mobileMenu) {
-    mobileMenuButton.addEventListener('click', () => {
-        mobileMenu.classList.toggle('hidden');
+    // Open menu
+    function openMenu() {
+        menuOverlay.classList.remove('hidden');
+        // Keep overlay transparent - no background
+        menuPanel.classList.remove('translate-x-full');
+        document.body.style.overflow = 'hidden';
+    }
+
+    // Close menu
+    function closeMenu() {
+        menuOverlay.classList.add('hidden');
+        menuPanel.classList.add('translate-x-full');
+        document.body.style.overflow = '';
+    }
+
+    // Hamburger button click
+    if (hamburgerBtn) {
+        hamburgerBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            openMenu();
+        });
+    }
+
+    // Close button click
+    if (closeMenuBtn) {
+        closeMenuBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            closeMenu();
+        });
+    }
+
+    // Overlay click - disabled since overlay is transparent
+    // Users can only close menu via close button or menu items
+    if (menuOverlay) {
+        menuOverlay.addEventListener('click', (e) => {
+            e.preventDefault();
+            // Don't close menu on overlay click since it's transparent
+            // closeMenu();
+        });
+    }
+
+    // Menu items click
+    menuItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.preventDefault();
+            const href = item.getAttribute('href');
+            
+            // Close menu first
+            closeMenu();
+            
+            // Navigate after menu closes
+            setTimeout(() => {
+                if (href && href.startsWith('#')) {
+                    const target = document.querySelector(href);
+                    if (target) {
+                        const headerOffset = 80;
+                        const elementPosition = target.getBoundingClientRect().top;
+                        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+                        window.scrollTo({
+                            top: offsetPosition,
+                            behavior: 'smooth'
+                        });
+                    }
+                } else if (href) {
+                    window.location.href = href;
+                }
+            }, 300);
+        });
     });
-}
 
-// Close mobile menu when clicking on links
-const mobileMenuLinks = mobileMenu?.querySelectorAll('a');
-mobileMenuLinks?.forEach(link => {
-    link.addEventListener('click', () => {
-        mobileMenu.classList.add('hidden');
+    // CTA button click in mobile menu
+    const ctaButton = document.querySelector('a[href="#donasi"].w-full.flex.items-center.justify-center');
+    if (ctaButton) {
+        ctaButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            const href = ctaButton.getAttribute('href');
+            
+            // Close menu first
+            closeMenu();
+            
+            // Navigate after menu closes
+            setTimeout(() => {
+                if (href && href.startsWith('#')) {
+                    const target = document.querySelector(href);
+                    if (target) {
+                        const headerOffset = 80;
+                        const elementPosition = target.getBoundingClientRect().top;
+                        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+                        window.scrollTo({
+                            top: offsetPosition,
+                            behavior: 'smooth'
+                        });
+                    }
+                } else if (href) {
+                    window.location.href = href;
+                }
+            }, 300);
+        });
+    }
+
+    // ESC key to close
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !menuOverlay.classList.contains('hidden')) {
+            closeMenu();
+        }
     });
 });
 
